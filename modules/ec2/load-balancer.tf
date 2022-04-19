@@ -4,7 +4,7 @@ resource "aws_lb" "main" {
   name               = "${var.stack_name}-infra-load-balancer"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.main_sg.id]
+  security_groups    = [aws_security_group.lb_sg.id]
   subnets            = var.subnet_id
 
   enable_deletion_protection = true
