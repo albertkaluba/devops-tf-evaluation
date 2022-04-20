@@ -1,35 +1,26 @@
-## Elastic Load Balancer forwarding traffic to port 22
-
-resource "aws_lb" "main" {
-  name               = "${var.stack_name}-infra-load-balancer"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.lb_sg.id]
+resource "aws_elb" "main" {
+  name               = "${var.stack_name}-infra-elb"
   subnets            = var.subnet_id
+  security_groups    = [aws_security_group.lb_sg.id]
 
-  enable_deletion_protection = true
+  listener {
+    instance_port     = 22
+    instance_protocol = "tcp"
+    lb_port           = 22
+    lb_protocol       = "tcp"
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "tcp:22"
+    interval            = 30
+  }
 
   tags = {
-    Name             = "${var.stack_name}-infra-lb"
+    Name             = "${var.stack_name}-infra-elb"
     Environment      = var.env
-    Stack_Name       = var.stack_name
+    Stack_Name       = var.stack_name    
   }
-}
-
-resource "aws_lb_listener" "main" {
-  load_balancer_arn = aws_lb.main.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.main.arn
-  }
-}
-
-resource "aws_lb_target_group" "main" {
-  name               = "${var.stack_name}-infra-lb-tg"
-  port               = 22
-  protocol           = "TCP"
-  vpc_id             = var.vpc_id
 }
