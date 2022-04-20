@@ -1,10 +1,5 @@
 ## Autoscaling Group with 
 
-resource "aws_placement_group" "main_pg" {
-  name                      = "${var.stack_name}-infra-pg"
-  strategy                  = "cluster"
-}
-
 resource "aws_autoscaling_group" "main_asg" {
   name                      = "${var.stack_name}-infra-asg"
   max_size                  = 2
@@ -13,7 +8,6 @@ resource "aws_autoscaling_group" "main_asg" {
   health_check_type         = "ELB"
   desired_capacity          = 1
   force_delete              = true
-  placement_group           = aws_placement_group.main_pg.id
   launch_configuration      = aws_launch_configuration.main_lc.name
   vpc_zone_identifier       = var.subnet_id
 
@@ -55,6 +49,7 @@ resource "aws_launch_configuration" "main_lc" {
   image_id                  = data.aws_ami.linux.id
   instance_type             = "t2.micro"
   security_groups           = [aws_security_group.main_sg.id]
+  associate_public_ip_address = true
 
   lifecycle {
     create_before_destroy   = true
