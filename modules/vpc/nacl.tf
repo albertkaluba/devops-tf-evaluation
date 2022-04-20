@@ -16,3 +16,11 @@ resource "aws_network_acl" "main" {
     Stack_Name       = var.stack_name
   }
 }
+
+## Need to upgrade aws provider to 4.10
+# resource "aws_network_acl_association" "main" {
+#   network_acl_id = aws_network_acl.main.id
+#   subnet_id      = "${element(aws_subnet.main.*.id, count.index)}"
+
+#   count = 2
+# }
